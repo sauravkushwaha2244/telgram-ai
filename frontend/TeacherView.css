@@ -1,0 +1,261 @@
+.teacher-container {
+  background: white;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.teacher-container h2 {
+  margin-bottom: 28px;
+  font-size: 24px;
+  color: var(--text);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #F5F5F5 0%, #FAFAFA 100%);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.stat-card h3 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.stat-card.safe h3 {
+  color: var(--success);
+}
+
+.stat-card.review h3 {
+  color: var(--secondary);
+}
+
+.stat-card.risk h3 {
+  color: var(--danger);
+}
+
+.controls {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filter-group,
+.sort-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group label,
+.sort-group label {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.filter-group select,
+.sort-group select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+}
+
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.submissions-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.submissions-table thead {
+  background: linear-gradient(135deg, #F5F5F5 0%, #FAFAFA 100%);
+  border-bottom: 2px solid var(--border);
+}
+
+.submissions-table th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.submissions-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.submission-row:hover {
+  background-color: #FAFAFA;
+}
+
+.student-name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.file-name {
+  color: var(--text-light);
+  font-size: 13px;
+  word-break: break-word;
+}
+
+.score-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.score-num {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.score-mini {
+  height: 4px;
+  background: #E0E0E0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.score-mini div {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-select {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: white;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.status-select:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.loading {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-light);
+  font-size: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 64px 32px;
+  color: var(--text-light);
+  background: #F5F5F5;
+  border-radius: 8px;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.table-footer {
+  padding: 16px;
+  background: #F5F5F5;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-light);
+  border-radius: 0 0 8px 8px;
+}
+
+@media (max-width: 1024px) {
+  .teacher-container {
+    padding: 20px;
+  }
+
+  .submissions-table {
+    font-size: 13px;
+  }
+
+  .submissions-table th,
+  .submissions-table td {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .filter-group,
+  .sort-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .submissions-table {
+    font-size: 12px;
+  }
+
+  .submissions-table th,
+  .submissions-table td {
+    padding: 10px;
+  }
+
+  .status-select {
+    min-width: 100px;
+    padding: 4px 8px;
+  }
+}
