@@ -134,11 +134,11 @@ router.post("/upload", upload.single("assignment"), async (req, res) => {
       status,
       reasoning: analysis.reasoning
     };
-const assignment = useDatabase()
+
+    const assignment = useDatabase()
       ? await Assignment.create(payload)
       : payload;
 
-    
     await sendTelegramMessage(assignment);
 
     console.log(`✓ Analysis complete - Status: ${status}`);
