@@ -314,18 +314,6 @@
   .scores-grid {
     grid-template-columns: 1fr;
   }
-}
-}
-
-@media (max-width: 768px) {
-  .upload-section,
-  .result-section {
-    padding: 20px;
-  }
-
-  .scores-grid {
-    grid-template-columns: 1fr;
-  }
 
   .student-info {
     grid-template-columns: 1fr;
