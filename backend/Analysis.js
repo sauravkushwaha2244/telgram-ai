@@ -1,7 +1,7 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = client.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 async function analyzeWithAI(fileContent, studentName, rollNo, subject) {
   try {

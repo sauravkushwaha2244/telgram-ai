@@ -1,4 +1,4 @@
-// telegram.js - CORRECTED
+
 async function sendTelegramMessage(data) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -9,16 +9,16 @@ async function sendTelegramMessage(data) {
   }
 
   const message = `
-📢 New Assignment Submitted
+ New Assignment Submitted
 
-👤 Student: ${data.studentName}
-🎓 Roll No: ${data.rollNo}
-📘 Subject: ${data.subject}
-📄 File: ${data.fileName}
-🤖 AI Quality: ${data.aiScore}%
-⚠️ Plagiarism Risk: ${data.plagiarismScore}%
-✍️ Grammar: ${data.grammarScore}%
-🏷️ Status: ${data.status}
+ Student: ${data.studentName}
+ Roll No: ${data.rollNo}
+ Subject: ${data.subject}
+ File: ${data.fileName}
+ AI Quality: ${data.aiScore}%
+ Plagiarism Risk: ${data.plagiarismScore}%
+ Grammar: ${data.grammarScore}%
+ Status: ${data.status}
 `;
 
   try {
