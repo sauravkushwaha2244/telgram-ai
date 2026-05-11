@@ -1,15 +1,52 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = client.getGenerativeModel({ model: "gemini-2.5-flash" });
+// Models to try in order (each has separate quota)
+const MODEL_NAMES = [
+  "gemini-2.5-flash",
+  "gemini-1.5-flash",
+  "gemini-2.0-flash-lite"
+];
 
-async function analyzeWithAI(fileContent, studentName, rollNo, subject) {
-  try {
+let client = null;
+
+function getClient() {
+  if (!client) {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error("GEMINI_API_KEY missing");
     }
+    client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  }
+  return client;
+}
 
-    const prompt = `Analyze this student assignment and respond with ONLY a valid JSON object, nothing else.
+function getModel(modelName) {
+  return getClient().getGenerativeModel({ model: modelName });
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function callGemini(modelName, prompt) {
+  const aiModel = getModel(modelName);
+  const response = await aiModel.generateContent({
+    contents: [
+      {
+        role: "user",
+        parts: [{ text: prompt }]
+      }
+    ],
+    generationConfig: {
+      temperature: 0.1,
+      maxOutputTokens: 1024,
+      responseMimeType: "application/json"
+    }
+  });
+  return response.response.text() || "";
+}
+
+async function analyzeWithAI(fileContent, studentName, rollNo, subject) {
+  const prompt = `You are an academic assignment evaluator. Analyze this student assignment carefully and provide accurate scores.
 
 Student Name: ${studentName}
 Roll No: ${rollNo}
@@ -18,54 +55,90 @@ Subject: ${subject}
 Assignment Content:
 ${fileContent.slice(0, 6000)}
 
-RESPOND WITH ONLY THIS JSON FORMAT (no other text):
+Evaluate the assignment and respond with ONLY a valid JSON object:
 {
-  "qualityScore": 0-100,
-  "plagiarismRisk": 0-100,
-  "grammarScore": 0-100,
-  "reasoning": "brief analysis"
-}`;
+  "qualityScore": <number 0-100, how good is the content quality, research depth, and relevance>,
+  "plagiarismRisk": <number 0-100, likelihood of plagiarism based on writing style patterns>,
+  "grammarScore": <number 0-100, grammar and language quality>,
+  "reasoning": "<2-3 sentence analysis explaining your scores>"
+}
 
-    const response = await model.generateContent({
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: prompt }]
-        }
-      ],
-      generationConfig: {
-        temperature: 0,
-        maxOutputTokens: 1024
-      }
-    });
+Important: Provide realistic, varied scores based on actual content analysis. Do NOT default all scores to 50.`;
 
-    const text = response.response.text() || "";
-    console.log("AI Response:", text);
+  let lastError = null;
 
-    let result;
-
+  // Try each model in order
+  for (const modelName of MODEL_NAMES) {
     try {
-      result = JSON.parse(text.trim());
-    } catch (error) {
-      result = {
-        qualityScore: 50,
-        plagiarismRisk: 50,
-        grammarScore: 50,
-        reasoning: "Analysis could not be parsed"
+      console.log(`📤 Trying model: ${modelName}...`);
+
+      const rawText = await callGemini(modelName, prompt);
+      console.log(`📥 AI Response (${modelName}):`, rawText);
+
+      // Strip markdown code fences if present
+      let cleanText = rawText.trim();
+      cleanText = cleanText.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
+
+      let result;
+
+      try {
+        result = JSON.parse(cleanText);
+      } catch (parseError) {
+        const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            result = JSON.parse(jsonMatch[0]);
+          } catch (e) {
+            console.error("❌ Failed to parse extracted JSON:", e.message);
+            result = null;
+          }
+        } else {
+          console.error("❌ No JSON found in AI response:", cleanText);
+          result = null;
+        }
+      }
+
+      if (!result || typeof result !== "object") {
+        throw new Error("AI returned invalid analysis — could not parse response");
+      }
+
+      const qualityScore = Number(result.qualityScore);
+      const plagiarismRisk = Number(result.plagiarismRisk);
+      const grammarScore = Number(result.grammarScore);
+
+      const finalResult = {
+        qualityScore: isNaN(qualityScore) ? 50 : Math.max(0, Math.min(100, qualityScore)),
+        plagiarismRisk: isNaN(plagiarismRisk) ? 50 : Math.max(0, Math.min(100, plagiarismRisk)),
+        grammarScore: isNaN(grammarScore) ? 50 : Math.max(0, Math.min(100, grammarScore)),
+        reasoning: result.reasoning || "Analysis complete"
       };
+
+      console.log(`✅ Analysis complete (${modelName}):`, {
+        quality: finalResult.qualityScore,
+        plagiarism: finalResult.plagiarismRisk,
+        grammar: finalResult.grammarScore
+      });
+
+      return finalResult;
+
+    } catch (error) {
+      lastError = error;
+      const is429 = error.message && error.message.includes("429");
+
+      if (is429) {
+        console.warn(`⚠️ ${modelName} quota exceeded, trying next model...`);
+        continue;
+      }
+
+      // Non-rate-limit error — don't try other models
+      console.error(`❌ AI Error (${modelName}):`, error.message);
+      throw new Error(`AI Analysis failed: ${error.message}`);
     }
-
-    return {
-      qualityScore: Math.max(0, Math.min(100, Number(result.qualityScore) || 50)),
-      plagiarismRisk: Math.max(0, Math.min(100, Number(result.plagiarismRisk) || 50)),
-      grammarScore: Math.max(0, Math.min(100, Number(result.grammarScore) || 50)),
-      reasoning: result.reasoning || "Analysis complete"
-    };
-
-  } catch (error) {
-    console.error("AI Error:", error.message);
-    throw new Error(`AI Analysis failed: ${error.message}`);
   }
+
+  // All models exhausted
+  console.error("❌ All Gemini models quota exceeded");
+  throw new Error("AI Analysis failed: All model quotas exceeded. Please wait a few minutes and try again.");
 }
 
 module.exports = { analyzeWithAI };

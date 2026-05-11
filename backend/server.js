@@ -1,10 +1,23 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const dotenv = require("dotenv");
+const dotenv = require("dotenv")
 const path = require("path");
+const dns = require("dns");
 
 dotenv.config();
+
+// Force Google DNS for SRV record resolution (fixes restricted network issues)
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
+// Catch unhandled errors so the process doesn't crash silently
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
 
 const assignmentRoutes = require("./assignmentRoutes");
 
@@ -33,8 +46,18 @@ function startServer(message) {
     console.log(message);
   }
 
-  app.listen(process.env.PORT || 5000, () => {
-    console.log(`Server running on port ${process.env.PORT || 5000}`);
+  const PORT = process.env.PORT || 5000;
+  const server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`Port ${PORT} is already in use. Kill the other process or use a different port.`);
+    } else {
+      console.error("Server error:", err);
+    }
+    process.exit(1);
   });
 }
 
