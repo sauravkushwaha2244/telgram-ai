@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const upload = require("./config/upload");
 const Assignment = require("./Assignmet");
 const { analyzeWithAI } = require("./Analysis");
-const pdfParse = require("pdf-parse");
+const { PDFParse } = require("pdf-parse");
 const mammoth = require("mammoth");
 const { sendTelegramMessage } = require("./telegram");
 
@@ -33,8 +33,11 @@ async function extractTextFromBuffer(buffer, mimeType) {
     }
 
     if (mimeType === "application/pdf") {
-      const data = await pdfParse(buffer);
-      return data.text.slice(0, 15000);
+      const parser = new PDFParse({ data: new Uint8Array(buffer) });
+      await parser.load();
+      const text = await parser.getText();
+      await parser.destroy();
+      return text.slice(0, 15000);
     }
 
     if (
