@@ -2,26 +2,24 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
-  background-attachment: fixed;
 }
 
 .navbar {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: var(--nav-bg);
   color: white;
   padding: 0;
-  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+  box-shadow: var(--nav-shadow);
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .nav-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 20px 32px;
+  padding: 18px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -29,45 +27,97 @@
 }
 
 .logo {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.8px;
   background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .nav-buttons {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .nav-btn {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
   padding: 10px 20px;
-  border-radius: 8px;
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
   font-weight: 600;
-  font-size: 15px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 14px;
+  transition: var(--transition);
   cursor: pointer;
   backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.nav-btn:hover::before {
+  left: 100%;
 }
 
 .nav-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
   transform: translateY(-2px);
+  color: white;
 }
 
 .nav-btn.active {
   background: rgba(255, 255, 255, 0.95);
-  color: #6366f1;
+  color: #4f46e5;
   border-color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   font-weight: 700;
+}
+
+.theme-toggle {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  transition: var(--transition);
+  backdrop-filter: blur(10px);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px) rotate(20deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .main-content {
@@ -76,6 +126,7 @@
   margin: 0 auto;
   padding: 40px 32px;
   width: 100%;
+  animation: fadeIn 0.4s ease-out;
 }
 
 .loading {
@@ -90,18 +141,29 @@
   background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
   color: #991b1b;
   padding: 16px 20px;
-  border-radius: 10px;
-  border-left: 4px solid #ef4444;
-  margin-bottom: 24px;
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--danger);
+  margin: 16px 32px;
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+  animation: slideInUp 0.3s ease-out;
+}
+
+[data-theme="dark"] .error-banner {
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  color: #fecaca;
 }
 
 @media (max-width: 768px) {
   .nav-container {
-    padding: 16px 16px;
+    padding: 14px 16px;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
+  }
+
+  .nav-right {
+    width: 100%;
+    justify-content: center;
   }
 
   .nav-buttons {
@@ -111,5 +173,9 @@
 
   .main-content {
     padding: 24px 16px;
+  }
+
+  .logo {
+    font-size: 20px;
   }
 }

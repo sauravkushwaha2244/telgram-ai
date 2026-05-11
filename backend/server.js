@@ -7,10 +7,8 @@ const dns = require("dns");
 
 dotenv.config();
 
-// Force Google DNS for SRV record resolution (fixes restricted network issues)
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
-// Catch unhandled errors so the process doesn't crash silently
 process.on("unhandledRejection", (reason, promise) => {
   console.error("Unhandled Rejection at:", promise, "reason:", reason);
 });

@@ -10,6 +10,18 @@ function App() {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
   const fetchAssignments = async () => {
     try {
@@ -58,18 +70,23 @@ function App() {
       <nav className="navbar">
         <div className="nav-container">
           <h1 className="logo">🤖 AI Assignment System</h1>
-          <div className="nav-buttons">
-            <button 
-              className={`nav-btn ${page === 'student' ? 'active' : ''}`}
-              onClick={() => setPage('student')}
-            >
-              Student
-            </button>
-            <button 
-              className={`nav-btn ${page === 'teacher' ? 'active' : ''}`}
-              onClick={() => setPage('teacher')}
-            >
-              Teacher Dashboard
+          <div className="nav-right">
+            <div className="nav-buttons">
+              <button 
+                className={`nav-btn ${page === 'student' ? 'active' : ''}`}
+                onClick={() => setPage('student')}
+              >
+                📤 Student
+              </button>
+              <button 
+                className={`nav-btn ${page === 'teacher' ? 'active' : ''}`}
+                onClick={() => setPage('teacher')}
+              >
+                📋 Dashboard
+              </button>
+            </div>
+            <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
+              {theme === 'light' ? '🌙' : '☀️'}
             </button>
           </div>
         </div>

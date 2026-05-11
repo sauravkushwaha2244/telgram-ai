@@ -1,6 +1,5 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Models to try in order (each has separate quota)
 const MODEL_NAMES = [
   "gemini-2.5-flash",
   "gemini-1.5-flash",
@@ -67,7 +66,6 @@ Important: Provide realistic, varied scores based on actual content analysis. Do
 
   let lastError = null;
 
-  // Try each model in order
   for (const modelName of MODEL_NAMES) {
     try {
       console.log(`📤 Trying model: ${modelName}...`);
@@ -75,7 +73,6 @@ Important: Provide realistic, varied scores based on actual content analysis. Do
       const rawText = await callGemini(modelName, prompt);
       console.log(`📥 AI Response (${modelName}):`, rawText);
 
-      // Strip markdown code fences if present
       let cleanText = rawText.trim();
       cleanText = cleanText.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
 
@@ -130,13 +127,11 @@ Important: Provide realistic, varied scores based on actual content analysis. Do
         continue;
       }
 
-      // Non-rate-limit error — don't try other models
       console.error(`❌ AI Error (${modelName}):`, error.message);
       throw new Error(`AI Analysis failed: ${error.message}`);
     }
   }
 
-  // All models exhausted
   console.error("❌ All Gemini models quota exceeded");
   throw new Error("AI Analysis failed: All model quotas exceeded. Please wait a few minutes and try again.");
 }
